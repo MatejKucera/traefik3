@@ -11,6 +11,8 @@ services:
       - --api.insecure=${API_INSECURE}
       - --providers.docker=true
       - --providers.docker.exposedByDefault=false
+      - --entrypoints.traefik.address=:${DASHBOARD_PORT}
+      - --api.dashboard=$(DASHBOARD)
       #- --providers.file.filename=/dyn.toml
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
