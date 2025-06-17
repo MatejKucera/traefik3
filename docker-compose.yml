@@ -1,0 +1,27 @@
+services:
+
+  traefik:
+    image: "traefik:v3.4"
+    container_name: "traefik"
+    network_mode: host
+    restart: "always"
+    command:
+      - --log.level=${LOG_LEVEL}
+      - --global.sendAnonymousUsage=false
+      - --api.insecure=${API_INSECURE}
+      - --providers.docker=true
+      - --providers.docker.exposedByDefault=false
+      #- --providers.file.filename=/dyn.toml
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.web.http.redirections.entrypoint.permanent=true
+      - --certificatesResolvers.myresolver.acme.httpChallenge=true
+      - --certificatesResolvers.myresolver.acme.httpChallenge.entryPoint=web
+      - --certificatesResolvers.myresolver.acme.email=${EMAIL}
+      - --certificatesResolvers.myresolver.acme.storage=/letsencrypt/acme.json
+    volumes:
+      - ${CERTIFICATES_DIRECTORY}:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./dyn.toml:/dyn.toml
